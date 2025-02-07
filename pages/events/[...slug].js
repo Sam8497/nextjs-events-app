@@ -15,12 +15,10 @@ function FilteredEventsPage(props) {
 
   const filterData = router.query.slug;
 
-  const { data, error } = useSWR(
-    // 'https://nextjs-course-c81cc-default-rtdb.firebaseio.com/events.json'
-    'https://next-events-fb070-default-rtdb.firebaseio.com/events.json'
-  );
-
-  useEffect(() => {
+  async function getAllEvents() {
+    const response = await fetch('https://next-events-fb070-default-rtdb.firebaseio.com/events.json');
+    const data = await response.json();
+  
     if (data) {
       const events = [];
 
@@ -32,8 +30,13 @@ function FilteredEventsPage(props) {
       }
 
       setLoadedEvents(events);
-    }
-  }, [data]);
+    }    
+  }
+
+  useEffect(() => {   
+    getAllEvents()      
+  }, []);
+  
 
   let pageHeadData = (
     <Head>
@@ -73,8 +76,7 @@ function FilteredEventsPage(props) {
     numYear > 2030 ||
     numYear < 2021 ||
     numMonth < 1 ||
-    numMonth > 12 ||
-    error
+    numMonth > 12
   ) {
     return (
       <Fragment>
@@ -87,7 +89,7 @@ function FilteredEventsPage(props) {
         </div>
       </Fragment>
     );
-  }
+  }  
 
   const filteredEvents = loadedEvents.filter((event) => {
     const eventDate = new Date(event.date);
